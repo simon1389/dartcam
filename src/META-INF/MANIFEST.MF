@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Class-Path: artoolkitplus.jar artoolkitplus-macosx-x86_64.jar ffmpeg.j
+ ar ffmpeg-macosx-x86_64.jar flandmark.jar flandmark-macosx-x86_64.jar
+  flycapture.jar javacpp.jar javacv.jar libdc1394.jar libdc1394-macosx
+ -x86_64.jar libfreenect.jar libfreenect2.jar libfreenect-macosx-x86_6
+ 4.jar librealsense.jar opencv.jar opencv-331.jar opencv-macosx-x86_64
+ .jar videoinput.jar jxbrowser-win32-6.17.jar jxbrowser-mac-6.17.jar j
+ xbrowser-linux64-6.17.jar jxbrowser-6.17.jar vlcj-3.10.1-tests.jar vl
+ cj-3.10.1.jar slf4j-api-1.7.10.jar jna-platform-4.1.0.jar jna-4.1.0.j
+ ar license.jar
+Main-Class: Main
+
