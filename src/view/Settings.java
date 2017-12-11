@@ -59,21 +59,21 @@ public class Settings extends JDialog {
         secondCamURLField.setText(AppPreferences.getInstance().getSecondCamURL());
 
 
-        List<Webcam> webcams = Webcam.getWebcams();
-        this.checkBoxes = new HashMap<String, JCheckBox>();
-        for(int i = 0; i< webcams.size(); i++) {
-            Webcam cam = webcams.get(i);
-            GridConstraints c = new GridConstraints();
-            c.setRow(i + 2);
-            this.settingsPanel.add(new JLabel(cam.getName()), c);
-            c.setColumn(1);
-            JCheckBox box = new JCheckBox("aktiviert", AppPreferences.getInstance().isWebcamActivated(cam.getName()));
-            checkBoxes.put(cam.getName(), box);
-            this.settingsPanel.add(box, c);
-//            cam.setViewSize(AppPreferences.getInstance().getWebcamDimension(cam.getName()));
-//            WebcamPanel panel = new WebcamPanel(cam);
-//            panel.setMirrored(false);
-        }
+//        List<Webcam> webcams = Webcam.getWebcams();
+//        this.checkBoxes = new HashMap<String, JCheckBox>();
+//        for(int i = 0; i< webcams.size(); i++) {
+//            Webcam cam = webcams.get(i);
+//            GridConstraints c = new GridConstraints();
+//            c.setRow(i + 2);
+//            this.settingsPanel.add(new JLabel(cam.getName()), c);
+//            c.setColumn(1);
+//            JCheckBox box = new JCheckBox("aktiviert", AppPreferences.getInstance().isWebcamActivated(cam.getName()));
+//            checkBoxes.put(cam.getName(), box);
+//            this.settingsPanel.add(box, c);
+////            cam.setViewSize(AppPreferences.getInstance().getWebcamDimension(cam.getName()));
+////            WebcamPanel panel = new WebcamPanel(cam);
+////            panel.setMirrored(false);
+//        }
 
     }
 
