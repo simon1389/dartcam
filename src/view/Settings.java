@@ -1,6 +1,5 @@
 package view;
 
-import com.github.sarxos.webcam.Webcam;
 import com.intellij.uiDesigner.core.GridConstraints;
 import model.AppPreferences;
 

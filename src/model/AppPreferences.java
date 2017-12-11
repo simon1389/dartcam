@@ -1,7 +1,5 @@
 package model;
 
-import com.github.sarxos.webcam.WebcamResolution;
-
 import java.awt.*;
 import java.io.*;
 import java.util.prefs.Preferences;
@@ -48,16 +46,16 @@ public class AppPreferences {
         prefs.putInt("dividerLocation", dividerLocation);
     }
 
-    public Dimension getWebcamDimension(String webcamName) {
-        try {
-            return (Dimension)AppPreferences.bytes2Object(prefs.getByteArray("camDimension" + webcamName, AppPreferences.object2Bytes(WebcamResolution.VGA.getSize())));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return WebcamResolution.VGA.getSize();
-    }
+//    public Dimension getWebcamDimension(String webcamName) {
+//        try {
+//            return (Dimension)AppPreferences.bytes2Object(prefs.getByteArray("camDimension" + webcamName, AppPreferences.object2Bytes(WebcamResolution.VGA.getSize())));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        return WebcamResolution.VGA.getSize();
+//    }
 
     public void setWebcamDimension(String webcamName, Dimension dim) {
         try {

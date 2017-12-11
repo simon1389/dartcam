@@ -1,7 +1,5 @@
 package view;
 
-import com.github.sarxos.webcam.*;
-import com.github.sarxos.webcam.ds.javacv.JavaCvDriver;
 import com.sun.jna.Platform;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserType;

@@ -1,10 +1,6 @@
-import com.github.sarxos.webcam.*;
-import com.github.sarxos.webcam.ds.javacv.JavaCvDriver;
-import com.github.sarxos.webcam.ds.nativeapi.NativeWebcamDriver;
 import org.bytedeco.javacpp.opencv_videoio;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
-import uk.co.caprica.vlcj.medialist.MediaListItem;
 import view.DartMainForm;
 
 import javax.imageio.ImageIO;
@@ -18,10 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import com.github.sarxos.webcam.WebcamDevice;
-import com.github.sarxos.webcam.WebcamDriver;
-import com.github.sarxos.webcam.WebcamException;
-import com.github.sarxos.webcam.util.NixVideoDevUtils;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Platform;
 import java.io.File;
