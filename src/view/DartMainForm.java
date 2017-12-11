@@ -165,7 +165,7 @@ public class DartMainForm extends JFrame implements Runnable {
     }
 
     private void createWebcamPanels() {
-        DartCamPanel pan = new DartCamPanel(1);
+        DartCamPanel pan = new DartCamPanel(0);
 //        camPanel = new JScrollPane(pan);
         JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
         sp.setBottomComponent(pan);
