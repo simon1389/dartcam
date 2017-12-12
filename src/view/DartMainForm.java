@@ -1,6 +1,5 @@
 package view;
 
-import com.github.sarxos.webcam.Webcam;
 import com.sun.jna.Platform;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserType;
@@ -12,7 +11,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 
 public class DartMainForm extends JFrame implements Runnable {
 
@@ -22,7 +20,6 @@ public class DartMainForm extends JFrame implements Runnable {
 
     private Settings settingsDialog;
     private JDialog secondCamDialog = new JDialog();
-
 
     public DartMainForm() {
         this.setListeners();
@@ -101,7 +98,6 @@ public class DartMainForm extends JFrame implements Runnable {
 
         JMenuItem settings = new JMenuItem("Einstellungen");
         settingsDialog = new Settings();
-        settingsDialog.pack();
         settings.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

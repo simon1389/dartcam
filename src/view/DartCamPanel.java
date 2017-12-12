@@ -3,24 +3,33 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Point;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.VolatileImage;
 import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.ds.buildin.WebcamDefaultDevice;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.awt.GLJPanel;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureIO;
+import controller.CamMoveListener;
+import model.CamPosition;
+import model.ZoomedArea;
 import org.bytedeco.javacpp.opencv_core.*;
 import org.bytedeco.javacpp.opencv_videoio.*;
 
 public class DartCamPanel extends JPanel implements Runnable {
     public static List<String> cameraNames = DartCamPanel.getCameraNames();
-
-//    private int deviceNumber;
-//    private String deviceName;
 
     private VideoCapture camera;
     private BufferedImage bufferedImage;
@@ -35,9 +44,11 @@ public class DartCamPanel extends JPanel implements Runnable {
     private volatile boolean running = true;
     private Thread camThread;
 
+    private CamPosition camPosition;
+    private ZoomedArea[] zoomedAreas;
+
     public DartCamPanel(int deviceNumber) {
-//        this.deviceName = cameraNames.get(deviceNumber);
-//        this.deviceNumber = deviceNumber;
+        this.setZoomAndMoveListener();
         this.init(deviceNumber);
     }
 
@@ -70,44 +81,58 @@ public class DartCamPanel extends JPanel implements Runnable {
         WritableRaster raster = this.bufferedImage.getRaster();
         DataBufferByte dataBuffer = (DataBufferByte) raster.getDataBuffer();
         this.byteBuffer = dataBuffer.getData();
+        this.camPosition.resetPosition();
+        this.zoomedAreas = new ZoomedArea[]{new ZoomedArea()};
     }
 
     @Override
     public void paint(Graphics g) {
 //        g.drawImage(bufferedImage, 0, 0, this);
-        Dimension newDimension = this.getScaledDimension();
-        g.drawImage(volatileImage, 0, 0, newDimension.width, newDimension.height, this);
+//        Dimension newDimension = this.getScaledDimension();
+//        g.drawImage(volatileImage, 0, 0, newDimension.width, newDimension.height, this);
+        g.drawImage(volatileImage, camPosition.refPoint.x, camPosition.refPoint.y, (int)(volatileImage.getWidth() * camPosition.zoomLevel), (int)(volatileImage.getHeight() * camPosition.zoomLevel), this);
+//        this.drawZoomedAreas(g);
     }
 
-    public Dimension getScaledDimension() {
-        Dimension imgSize = new Dimension(1920, 1080);
-        Dimension boundary = this.getSize();
-
-        int original_width = imgSize.width;
-        int original_height = imgSize.height;
-        int bound_width = boundary.width;
-        int bound_height = boundary.height;
-        int new_width = original_width;
-        int new_height = original_height;
-
-        // first check if we need to scale width
-        if (original_width > bound_width) {
-            //scale width to fit
-            new_width = bound_width;
-            //scale height to maintain aspect ratio
-            new_height = (new_width * original_height) / original_width;
+    private void drawZoomedAreas(Graphics g) {
+        if (zoomedAreas != null) {
+            for (ZoomedArea za : zoomedAreas) {
+                Rectangle r = za.getOriginRectToZoom();
+                BufferedImage zoomedImage = bufferedImage.getSubimage(r.x, r.y, r.width, r.height);
+                g.drawImage(zoomedImage, g.getClipBounds().width - zoomedImage.getWidth(), 0, null);
+            }
         }
-
-        // then check if we need to scale even with the new height
-        if (new_height > bound_height) {
-            //scale height to fit instead
-            new_height = bound_height;
-            //scale width to maintain aspect ratio
-            new_width = (new_height * original_width) / original_height;
-        }
-
-        return new Dimension(new_width, new_height);
     }
+
+//    public Dimension getScaledDimension() {
+//        Dimension imgSize = new Dimension(1920, 1080);
+//        Dimension boundary = this.getSize();
+//
+//        int original_width = imgSize.width;
+//        int original_height = imgSize.height;
+//        int bound_width = boundary.width;
+//        int bound_height = boundary.height;
+//        int new_width = original_width;
+//        int new_height = original_height;
+//
+//        // first check if we need to scale width
+//        if (original_width > bound_width) {
+//            //scale width to fit
+//            new_width = bound_width;
+//            //scale height to maintain aspect ratio
+//            new_height = (new_width * original_height) / original_width;
+//        }
+//
+//        // then check if we need to scale even with the new height
+//        if (new_height > bound_height) {
+//            //scale height to fit instead
+//            new_height = bound_height;
+//            //scale width to maintain aspect ratio
+//            new_width = (new_height * original_width) / original_height;
+//        }
+//
+//        return new Dimension(new_width, new_height);
+//    }
 
     @Override
     public void run() {
@@ -140,6 +165,15 @@ public class DartCamPanel extends JPanel implements Runnable {
             e.printStackTrace();
         }
     }
+
+    private void setZoomAndMoveListener() {
+        camPosition = new CamPosition();
+        CamMoveListener camListener = new CamMoveListener(camPosition);
+        this.addMouseListener(camListener);
+        this.addMouseWheelListener(camListener);
+        this.addMouseMotionListener(camListener);
+    }
+
 
     private static List<String> getCameraNames() {
         List<String> names = new ArrayList<String>();

@@ -1,6 +1,7 @@
 import view.DartMainForm;
 
 import javax.swing.*;
+import java.awt.*;
 
 
 public class Main {
@@ -11,6 +12,25 @@ public class Main {
 
         DartMainForm form = new DartMainForm();
         SwingUtilities.invokeLater(form);
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                SplashScreen splash = SplashScreen.getSplashScreen();
+//                if (splash == null) {
+//                    System.out
+//                            .println("SplashScreen kann nicht erzeugt werden.");
+//                    return;
+//                }
+//                try {
+//                    Thread.sleep(5000);
+//                } catch (InterruptedException e) {
+//                    System.err.println("Thread unterbrochen");
+//                }
+//                splash.close();
+//                form.setVisible(true);
+//            }
+//        }).start();
 
 //        boolean found = new NativeDiscovery().discover();
 //        System.out.println(found);

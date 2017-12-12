@@ -65,6 +65,9 @@ public class Settings extends JDialog {
                 }
             }
         });
+
+        pack();
+        setLocationRelativeTo(null);
     }
 
     private void setValues() {
