@@ -38,13 +38,48 @@ public class AppPreferences {
         prefs.put("leftPanelURL", leftPanelURL);
     }
 
-    public int getDividerLocation() {
-        return prefs.getInt("dividerLocation", 300);
+    public int getDividerLocationVertical() {
+        return prefs.getInt("dividerLocationVert", 300);
     }
 
-    public void setDividerLocation(int dividerLocation) {
-        prefs.putInt("dividerLocation", dividerLocation);
+    public void setDividerLocationVertical(int dividerLocation) {
+        prefs.putInt("dividerLocationVert", dividerLocation);
     }
+
+    public int getDividerLocationHorizontal() {
+        return prefs.getInt("dividerLocationHoriz", 300);
+    }
+
+    public void setDividerLocationHorizontal(int dividerLocation) {
+        prefs.putInt("dividerLocationHoriz", dividerLocation);
+    }
+
+    public int getChoosenCamera() {
+        return prefs.getInt("choosenCamera", 0);
+    }
+
+    public void setChoosenCamera(int deviceNumber) {
+        prefs.putInt("choosenCamera", deviceNumber);
+    }
+
+    public Rectangle getSecondCamBounds() {
+        try {
+            return (Rectangle)AppPreferences.bytes2Object(prefs.getByteArray("secondCamWindowBounds", AppPreferences.object2Bytes(new Rectangle(0,0,200,200))));
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void setSecondCamBounds(Rectangle rect) {
+        try {
+            prefs.putByteArray("secondCamWindowBounds", AppPreferences.object2Bytes(rect));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 //    public Dimension getWebcamDimension(String webcamName) {
 //        try {
@@ -85,7 +120,6 @@ public class AppPreferences {
             throws IOException, ClassNotFoundException {
         ByteArrayInputStream bais = new ByteArrayInputStream( raw );
         ObjectInputStream ois = new ObjectInputStream( bais );
-        Object o = ois.readObject();
-        return o;
+        return ois.readObject();
     }
 }

@@ -8,14 +8,20 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.VolatileImage;
 import java.awt.image.WritableRaster;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.ds.buildin.WebcamDefaultDevice;
 import org.bytedeco.javacpp.opencv_core.*;
 import org.bytedeco.javacpp.opencv_videoio.*;
 
 public class DartCamPanel extends JPanel implements Runnable {
+    public static List<String> cameraNames = DartCamPanel.getCameraNames();
 
+//    private int deviceNumber;
+//    private String deviceName;
 
-    private int deviceNumber;
     private VideoCapture camera;
     private BufferedImage bufferedImage;
 
@@ -26,8 +32,16 @@ public class DartCamPanel extends JPanel implements Runnable {
     private Mat frame;
     private byte[] byteBuffer;
 
+    private volatile boolean running = true;
+    private Thread camThread;
+
     public DartCamPanel(int deviceNumber) {
-        this.deviceNumber = deviceNumber;
+//        this.deviceName = cameraNames.get(deviceNumber);
+//        this.deviceNumber = deviceNumber;
+        this.init(deviceNumber);
+    }
+
+    public void init(int deviceNumber) {
         this.camera = new VideoCapture(deviceNumber);
         this.gConfig = GraphicsEnvironment.
                 getLocalGraphicsEnvironment().getDefaultScreenDevice().
@@ -97,7 +111,13 @@ public class DartCamPanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        while(true){
+        running = true;
+        while(running){
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             repaint();
             if (camera.read(frame)){
                 ByteBuffer bb = frame.createBuffer();
@@ -108,6 +128,26 @@ public class DartCamPanel extends JPanel implements Runnable {
     }
 
     public void start() {
-        new Thread(this).start();
+        this.camThread = new Thread(this);
+        this.camThread.start();
+    }
+
+    public void stop() {
+        this.running = false;
+        try {
+            this.camThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<String> getCameraNames() {
+        List<String> names = new ArrayList<String>();
+        List<Webcam> availableCams = Webcam.getWebcams();
+        for (Webcam cam: availableCams) {
+            names.add(((WebcamDefaultDevice)cam.getDevice()).getDeviceName());
+        }
+
+        return names;
     }
 }

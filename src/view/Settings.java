@@ -15,14 +15,17 @@ public class Settings extends JDialog {
 
     private JTextField leftPanelURLField;
     private JTextField secondCamURLField;
-    private HashMap<String, JCheckBox> checkBoxes;
 
+    public DartCamPanel camPanel;
     private JPanel settingsPanel;
+    private JComboBox cameraComboBox;
 
     public Settings() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+
+        this.setValues();
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -51,39 +54,37 @@ public class Settings extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        this.setValues();
+        cameraComboBox.addActionListener (new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                int deviceNumber = cameraComboBox.getSelectedIndex();
+                if (deviceNumber != AppPreferences.getInstance().getChoosenCamera()) {
+                    AppPreferences.getInstance().setChoosenCamera(deviceNumber);
+                    camPanel.stop();
+                    camPanel.init(deviceNumber);
+                    camPanel.start();
+                }
+            }
+        });
     }
 
     private void setValues() {
         leftPanelURLField.setText(AppPreferences.getInstance().getLeftPanelURL());
         secondCamURLField.setText(AppPreferences.getInstance().getSecondCamURL());
 
-
-//        List<Webcam> webcams = Webcam.getWebcams();
-//        this.checkBoxes = new HashMap<String, JCheckBox>();
-//        for(int i = 0; i< webcams.size(); i++) {
-//            Webcam cam = webcams.get(i);
-//            GridConstraints c = new GridConstraints();
-//            c.setRow(i + 2);
-//            this.settingsPanel.add(new JLabel(cam.getName()), c);
-//            c.setColumn(1);
-//            JCheckBox box = new JCheckBox("aktiviert", AppPreferences.getInstance().isWebcamActivated(cam.getName()));
-//            checkBoxes.put(cam.getName(), box);
-//            this.settingsPanel.add(box, c);
-////            cam.setViewSize(AppPreferences.getInstance().getWebcamDimension(cam.getName()));
-////            WebcamPanel panel = new WebcamPanel(cam);
-////            panel.setMirrored(false);
-//        }
-
+        for (String camName : DartCamPanel.cameraNames) {
+            cameraComboBox.addItem(camName);
+        }
+        int deviceNumber = AppPreferences.getInstance().getChoosenCamera();
+        if (DartCamPanel.cameraNames.size() - 1 < deviceNumber) {
+            deviceNumber = 0;
+        }
+        cameraComboBox.setSelectedIndex(deviceNumber);
     }
 
     private void onOK() {
         AppPreferences.getInstance().setLeftPanelURL(leftPanelURLField.getText());
         AppPreferences.getInstance().setSecondCamURL(secondCamURLField.getText());
-
-        for (Map.Entry<String,JCheckBox> pair : checkBoxes.entrySet()) {
-            AppPreferences.getInstance().setWebcamActivated(pair.getKey(), pair.getValue().isSelected());
-        }
+        AppPreferences.getInstance().setChoosenCamera(cameraComboBox.getSelectedIndex());
 
         dispose();
     }
@@ -92,15 +93,4 @@ public class Settings extends JDialog {
         // add your code here if necessary
         dispose();
     }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
-
-//    public static void main(String[] args) {
-//        Settings dialog = new Settings();
-//        dialog.pack();
-//        dialog.setVisible(true);
-//        System.exit(0);
-//    }
 }
