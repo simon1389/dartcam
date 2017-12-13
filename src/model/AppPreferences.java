@@ -1,5 +1,7 @@
 package model;
 
+import view.DartCamPanel;
+
 import java.awt.*;
 import java.io.*;
 import java.util.prefs.Preferences;
@@ -55,7 +57,11 @@ public class AppPreferences {
     }
 
     public int getChoosenCamera() {
-        return prefs.getInt("choosenCamera", 0);
+        int deviceNumber = prefs.getInt("choosenCamera", 0);
+        if (DartCamPanel.cameraNames.size() - 1 < deviceNumber) {
+            deviceNumber = 0;
+        }
+        return deviceNumber;
     }
 
     public void setChoosenCamera(int deviceNumber) {
@@ -78,36 +84,6 @@ public class AppPreferences {
             e.printStackTrace();
         }
     }
-
-
-
-//    public Dimension getWebcamDimension(String webcamName) {
-//        try {
-//            return (Dimension)AppPreferences.bytes2Object(prefs.getByteArray("camDimension" + webcamName, AppPreferences.object2Bytes(WebcamResolution.VGA.getSize())));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        return WebcamResolution.VGA.getSize();
-//    }
-
-    public void setWebcamDimension(String webcamName, Dimension dim) {
-        try {
-            prefs.putByteArray("camDimension" + webcamName, AppPreferences.object2Bytes(dim));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean isWebcamActivated(String webcamName) {
-        return prefs.getBoolean("camActivated" + webcamName, true);
-    }
-
-    public void setWebcamActivated(String webcamName, boolean isActivated) {
-        prefs.putBoolean("camActivated" + webcamName, isActivated);
-    }
-
 
     static private byte[] object2Bytes( Object o ) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

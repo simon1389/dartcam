@@ -78,9 +78,6 @@ public class Settings extends JDialog {
             cameraComboBox.addItem(camName);
         }
         int deviceNumber = AppPreferences.getInstance().getChoosenCamera();
-        if (DartCamPanel.cameraNames.size() - 1 < deviceNumber) {
-            deviceNumber = 0;
-        }
         cameraComboBox.setSelectedIndex(deviceNumber);
     }
 
