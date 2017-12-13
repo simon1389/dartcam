@@ -47,6 +47,9 @@ public class DartCamPanel extends JPanel implements Runnable {
     private CamPosition camPosition;
     private ZoomedArea[] zoomedAreas;
 
+    private int frameCounter = 0;
+    private int paintCounter = 0;
+
     public DartCamPanel(int deviceNumber) {
         this.setZoomAndMoveListener();
         this.init(deviceNumber);
@@ -87,6 +90,7 @@ public class DartCamPanel extends JPanel implements Runnable {
 
     @Override
     public void paint(Graphics g) {
+        this.paintCounter++;
 //        g.drawImage(bufferedImage, 0, 0, this);
 //        Dimension newDimension = this.getScaledDimension();
 //        g.drawImage(volatileImage, 0, 0, newDimension.width, newDimension.height, this);
@@ -136,6 +140,8 @@ public class DartCamPanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
+//        this.testFPS();
+//        this.doRepaints();
         running = true;
         while(running){
             try {
@@ -145,11 +151,51 @@ public class DartCamPanel extends JPanel implements Runnable {
             }
             repaint();
             if (camera.read(frame)){
+                this.frameCounter++;
                 ByteBuffer bb = frame.createBuffer();
                 bb.get(this.byteBuffer, 0, bb.capacity());
                 volatileContext.drawImage(this.bufferedImage, 0, 0, null);
             }
         }
+    }
+
+    private void doRepaints() {
+        DartCamPanel panel = this;
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    panel.repaint();
+//                    panel.paintImmediately(panel.getBounds());
+                }
+            }
+        });
+        t.start();
+    }
+
+    private void testFPS() {
+        DartCamPanel panel = this;
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    int frameCounterStart = panel.frameCounter;
+                    int paintCounterStart = panel.paintCounter;
+                    System.out.println(System.currentTimeMillis());
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    int frames = panel.frameCounter - frameCounterStart;
+                    int paints = panel.paintCounter - paintCounterStart;
+                    System.out.println(System.currentTimeMillis());
+                    System.out.println("FPS: " + frames);
+                    System.out.println("PPS: " + paints);
+                }
+            }
+        });
+        t.start();
     }
 
     public void start() {

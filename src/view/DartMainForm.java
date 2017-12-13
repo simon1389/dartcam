@@ -19,7 +19,7 @@ public class DartMainForm extends JFrame implements Runnable {
     private JSplitPane splitPaneHorizontal = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
 
     private Settings settingsDialog;
-    private JDialog secondCamDialog = new JDialog();
+    private JDialog secondCamDialog = new FramelessDialog();
 
     public DartMainForm() {
         this.setListeners();
@@ -106,24 +106,6 @@ public class DartMainForm extends JFrame implements Runnable {
         });
         menu.add(settings);
 
-        JCheckBoxMenuItem b = new JCheckBoxMenuItem("SecondScreenDraggable", true);
-        b.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                secondCamDialog.setVisible(false);
-                secondCamDialog.dispose();
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    secondCamDialog.setUndecorated(false);
-                } else {
-                    secondCamDialog.setUndecorated(true);
-                }
-                secondCamDialog.setVisible(true);
-                secondCamDialog.setAlwaysOnTop(true);
-            }
-        });
-
-        menu.add(b);
         bar.add(menu);
         this.setJMenuBar(bar);
     }
@@ -155,7 +137,7 @@ public class DartMainForm extends JFrame implements Runnable {
         Browser browser1 = new Browser(BrowserType.LIGHTWEIGHT);
         BrowserView view1 = new BrowserView(browser1);
 
-        secondCamDialog.getContentPane().add(view1, BorderLayout.CENTER);
+        secondCamDialog.add(view1);
         browser1.loadURL(AppPreferences.getInstance().getSecondCamURL());
         secondCamDialog.setBounds(AppPreferences.getInstance().getSecondCamBounds());
         secondCamDialog.setResizable(true);
