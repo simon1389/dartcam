@@ -3,25 +3,16 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Point;
-import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.VolatileImage;
 import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.ds.buildin.WebcamDefaultDevice;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.awt.GLJPanel;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
 import controller.CamMoveListener;
 import model.CamPosition;
 import model.ZoomedArea;
