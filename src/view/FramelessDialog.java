@@ -7,10 +7,11 @@ import java.awt.event.*;
 public class FramelessDialog extends JDialog {
 
     private JButton fixButton = new JButton();
-    private JLayeredPane layeredPane = new JLayeredPane();
+    protected JLayeredPane layeredPane = new JLayeredPane();
 
     public FramelessDialog() {
         super();
+        setAlwaysOnTop(true);
         setFrameHideListener();
     }
 

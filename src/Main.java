@@ -1,3 +1,4 @@
+import sun.swing.SwingUtilities2;
 import view.DartMainForm;
 
 import javax.swing.*;
@@ -5,11 +6,16 @@ import java.awt.*;
 
 
 public class Main {
-    public static void main(String args[])  {
+    public static void main(String args[]) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
         System.setProperty("sun.java2d.opengl", "true");
         System.setProperty("sun.java2d.accthreshold","0");
         System.setProperty("apple.laf.useScreenMenuBar", "true");
 
+        System.out.println("max " + Runtime.getRuntime().maxMemory()/(1024*1024));
+        System.out.println("free " + Runtime.getRuntime().freeMemory()/(1024*1024));
+        System.out.println("total " + Runtime.getRuntime().totalMemory()/(1024*1024));
+
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         DartMainForm form = new DartMainForm();
         SwingUtilities.invokeLater(form);
 

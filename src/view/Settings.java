@@ -2,6 +2,7 @@ package view;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import model.AppPreferences;
+import model.Camera;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -16,7 +17,7 @@ public class Settings extends JDialog {
     private JTextField leftPanelURLField;
     private JTextField secondCamURLField;
 
-    public DartCamPanel camPanel;
+    public Camera camera;
     private JPanel settingsPanel;
     private JComboBox cameraComboBox;
 
@@ -59,9 +60,9 @@ public class Settings extends JDialog {
                 int deviceNumber = cameraComboBox.getSelectedIndex();
                 if (deviceNumber != AppPreferences.getInstance().getChoosenCamera()) {
                     AppPreferences.getInstance().setChoosenCamera(deviceNumber);
-                    camPanel.stop();
-                    camPanel.init(deviceNumber);
-                    camPanel.start();
+                    camera.stop();
+                    camera.init(deviceNumber);
+                    camera.start();
                 }
             }
         });
@@ -74,7 +75,7 @@ public class Settings extends JDialog {
         leftPanelURLField.setText(AppPreferences.getInstance().getLeftPanelURL());
         secondCamURLField.setText(AppPreferences.getInstance().getSecondCamURL());
 
-        for (String camName : DartCamPanel.cameraNames) {
+        for (String camName : Camera.getCameraNames()) {
             cameraComboBox.addItem(camName);
         }
         cameraComboBox.setSelectedIndex(AppPreferences.getInstance().getChoosenCamera());

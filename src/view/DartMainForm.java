@@ -5,6 +5,7 @@ import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserType;
 import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 import model.AppPreferences;
+import model.Camera;
 
 import javax.swing.*;
 import java.awt.*;
@@ -111,8 +112,10 @@ public class DartMainForm extends JFrame implements Runnable {
     }
 
     private void generateRightPanel() {
-        DartCamPanel pan = new DartCamPanel(AppPreferences.getInstance().getChoosenCamera());
-        settingsDialog.camPanel = pan;
+        Camera cam = new Camera();
+        cam.init(AppPreferences.getInstance().getChoosenCamera());
+        DartCamPanel pan = new DartCamPanel(cam);
+        settingsDialog.camera = cam;
         splitPaneHorizontal.setBottomComponent(pan);
         splitPaneHorizontal.setTopComponent(new JPanel());
         splitPaneVertical.setRightComponent(splitPaneHorizontal);
@@ -120,7 +123,11 @@ public class DartMainForm extends JFrame implements Runnable {
 
         splitPaneHorizontal.setDividerLocation(AppPreferences.getInstance().getDividerLocationHorizontal());
 
-        pan.start();
+        ZoomedAreaDialog dialog = new ZoomedAreaDialog();
+        dialog.setSize(100,100);
+        dialog.setVisible(true);
+        dialog.add(new DartCamPanel(cam));
+//        cam.start();
     }
 
     private void generateLeftPanel() {

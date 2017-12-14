@@ -58,7 +58,7 @@ public class AppPreferences {
 
     public int getChoosenCamera() {
         int deviceNumber = prefs.getInt("choosenCamera", 0);
-        if (DartCamPanel.cameraNames.size() - 1 < deviceNumber) {
+        if (Camera.getCameraNames().size() - 1 < deviceNumber) {
             deviceNumber = 0;
         }
         return deviceNumber;

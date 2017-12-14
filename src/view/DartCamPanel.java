@@ -5,99 +5,50 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.awt.image.VolatileImage;
-import java.awt.image.WritableRaster;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.image.DataBufferInt;
+import java.util.Arrays;
+import java.util.Observable;
+import java.util.Observer;
 
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.ds.buildin.WebcamDefaultDevice;
 import controller.CamMoveListener;
 import model.CamPosition;
+import model.Camera;
 import model.ZoomedArea;
-import org.bytedeco.javacpp.opencv_core.*;
-import org.bytedeco.javacpp.opencv_videoio.*;
 
-public class DartCamPanel extends JPanel implements Runnable {
-    public static List<String> cameraNames = DartCamPanel.getCameraNames();
+public class DartCamPanel extends JPanel implements Observer {
 
-    private VideoCapture camera;
-    private BufferedImage bufferedImage;
-
-    private VolatileImage volatileImage;
-    private Graphics2D volatileContext;
-
-    private GraphicsConfiguration gConfig;
-    private Mat frame;
-    private byte[] byteBuffer;
-
-    private volatile boolean running = true;
-    private Thread camThread;
-
+    private Camera cameraModel;
     private CamPosition camPosition;
-    private ZoomedArea[] zoomedAreas;
 
-    private int frameCounter = 0;
-    private int paintCounter = 0;
+    private long m;
 
-    public DartCamPanel(int deviceNumber) {
-        this.setZoomAndMoveListener();
-        this.init(deviceNumber);
+    public DartCamPanel(Camera camera) {
+        this.setIgnoreRepaint(true);
+        this.cameraModel = camera;
+        this.camPosition = new CamPosition();
+//        this.cameraModel.zoomedAreas = new ZoomedArea[]{new ZoomedArea(camera, camPosition)};
+        setZoomAndMoveListener();
+        camera.addObserver(this);
     }
 
-    public void init(int deviceNumber) {
-        this.camera = new VideoCapture(deviceNumber);
-        this.gConfig = GraphicsEnvironment.
-                getLocalGraphicsEnvironment().getDefaultScreenDevice().
-                getDefaultConfiguration();
-
-        this.frame = new Mat();
-        camera.read(frame);
-        int frameWidth = frame.size().width();
-        int frameHeight = frame.size().height();
-
-        try {
-            this.volatileImage = this.gConfig.createCompatibleVolatileImage(frameWidth, frameHeight, new ImageCapabilities(false), 3);
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
-
-        this.volatileContext = this.volatileImage.createGraphics();
-
-        int type = 0;
-        if (frame.channels() == 1) {
-            type = BufferedImage.TYPE_BYTE_GRAY;
-        } else if (frame.channels() == 3) {
-            type = BufferedImage.TYPE_3BYTE_BGR;
-        }
-        this.bufferedImage = new BufferedImage(frameWidth, frameHeight, type);
-        WritableRaster raster = this.bufferedImage.getRaster();
-        DataBufferByte dataBuffer = (DataBufferByte) raster.getDataBuffer();
-        this.byteBuffer = dataBuffer.getData();
-        this.camPosition.resetPosition();
-        this.zoomedAreas = new ZoomedArea[]{new ZoomedArea()};
+    public Camera getCameraModel() {
+        return cameraModel;
     }
 
-    @Override
-    public void paint(Graphics g) {
-        this.paintCounter++;
-//        g.drawImage(bufferedImage, 0, 0, this);
-//        Dimension newDimension = this.getScaledDimension();
-//        g.drawImage(volatileImage, 0, 0, newDimension.width, newDimension.height, this);
-        g.drawImage(volatileImage, camPosition.refPoint.x, camPosition.refPoint.y, (int)(volatileImage.getWidth() * camPosition.zoomLevel), (int)(volatileImage.getHeight() * camPosition.zoomLevel), this);
-//        this.drawZoomedAreas(g);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        cameraModel.paintCounter++;
+        g.drawImage(cameraModel.volatileImage, camPosition.refPoint.x, camPosition.refPoint.y, (int)(cameraModel.volatileImage.getWidth() * camPosition.zoomLevel), (int)(cameraModel.volatileImage.getHeight() * camPosition.zoomLevel), this);
+//      drawZoomedAreas(g);
     }
 
-    private void drawZoomedAreas(Graphics g) {
-        if (zoomedAreas != null) {
-            for (ZoomedArea za : zoomedAreas) {
-                Rectangle r = za.getOriginRectToZoom();
-                BufferedImage zoomedImage = bufferedImage.getSubimage(r.x, r.y, r.width, r.height);
-                g.drawImage(zoomedImage, g.getClipBounds().width - zoomedImage.getWidth(), 0, null);
-            }
-        }
-    }
+//    private void drawZoomedAreas(Graphics g) {
+//        if (cameraModel.zoomedAreas != null) {
+//            for (ZoomedArea za : cameraModel.zoomedAreas) {
+//                za.draw(g);
+//            }
+//        }
+//    }
 
 //    public Dimension getScaledDimension() {
 //        Dimension imgSize = new Dimension(1920, 1080);
@@ -129,96 +80,30 @@ public class DartCamPanel extends JPanel implements Runnable {
 //        return new Dimension(new_width, new_height);
 //    }
 
-    @Override
-    public void run() {
-//        this.testFPS();
-//        this.doRepaints();
-        running = true;
-        while(running){
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            repaint();
-            if (camera.read(frame)){
-                this.frameCounter++;
-                ByteBuffer bb = frame.createBuffer();
-                bb.get(this.byteBuffer, 0, bb.capacity());
-                volatileContext.drawImage(this.bufferedImage, 0, 0, null);
-            }
-        }
-    }
-
-    private void doRepaints() {
-        DartCamPanel panel = this;
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(true) {
-                    panel.repaint();
-//                    panel.paintImmediately(panel.getBounds());
-                }
-            }
-        });
-        t.start();
-    }
-
-    private void testFPS() {
-        DartCamPanel panel = this;
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(true) {
-                    int frameCounterStart = panel.frameCounter;
-                    int paintCounterStart = panel.paintCounter;
-                    System.out.println(System.currentTimeMillis());
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    int frames = panel.frameCounter - frameCounterStart;
-                    int paints = panel.paintCounter - paintCounterStart;
-                    System.out.println(System.currentTimeMillis());
-                    System.out.println("FPS: " + frames);
-                    System.out.println("PPS: " + paints);
-                }
-            }
-        });
-        t.start();
-    }
-
-    public void start() {
-        this.camThread = new Thread(this);
-        this.camThread.start();
-    }
-
-    public void stop() {
-        this.running = false;
-        try {
-            this.camThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void doRepaints() {
+//        DartCamPanel panel = this;
+//        Thread t = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while(true) {
+//                    panel.repaint();
+////                    panel.paintImmediately(panel.getBounds());
+//                }
+//            }
+//        });
+//        t.start();
+//    }
 
     private void setZoomAndMoveListener() {
-        camPosition = new CamPosition();
+//        cameraModel = new Camera(this);
         CamMoveListener camListener = new CamMoveListener(camPosition);
-        this.addMouseListener(camListener);
-        this.addMouseWheelListener(camListener);
-        this.addMouseMotionListener(camListener);
+        addMouseListener(camListener);
+        addMouseWheelListener(camListener);
+        addMouseMotionListener(camListener);
     }
 
-
-    private static List<String> getCameraNames() {
-        List<String> names = new ArrayList<String>();
-        List<Webcam> availableCams = Webcam.getWebcams();
-        for (Webcam cam: availableCams) {
-            names.add(((WebcamDefaultDevice)cam.getDevice()).getDeviceName());
-        }
-
-        return names;
+    @Override
+    public void update(Observable o, Object arg) {
+        repaint();
     }
 }

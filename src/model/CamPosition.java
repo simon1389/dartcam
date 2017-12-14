@@ -2,11 +2,11 @@ package model;
 
 import java.awt.*;
 
-public class CamPosition {
+public class CamPosition implements MoveableElement {
     public Point refPoint = new Point(0,0);
     public double zoomLevel = 1;
 
-    public void moveCam(int deltaX, int deltaY) {
+    public void move(int deltaX, int deltaY) {
         refPoint.translate(deltaX, deltaY);
     }
 
@@ -24,7 +24,7 @@ public class CamPosition {
         }
     }
 
-    public void resetPosition() {
+    public void reset() {
         zoomLevel = 1;
         refPoint = new Point(0,0);
     }
