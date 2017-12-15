@@ -6,12 +6,15 @@ import com.teamdev.jxbrowser.chromium.BrowserType;
 import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 import model.AppPreferences;
 import model.Camera;
+import model.ZoomedArea;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DartMainForm extends JFrame implements Runnable {
 
@@ -80,21 +83,29 @@ public class DartMainForm extends JFrame implements Runnable {
             this.setUndecorated(true);
         }
 
-        this.setMenuBar();
+        Camera cam = new Camera();
+        cam.init(AppPreferences.getInstance().getChoosenCamera());
+
+        this.setMenuBar(cam);
 
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(splitPaneVertical, BorderLayout.CENTER);
 
         this.setVisible(true);
 
-        this.generateRightPanel();
+        this.generateRightPanel(cam);
         this.generateLeftPanel();
+
+        ZoomedAreaDialog.restoreAllFromSettings(cam);
 
         splitPaneVertical.setDividerLocation(AppPreferences.getInstance().getDividerLocationVertical());
     }
 
-    private void setMenuBar() {
+    private void setMenuBar(Camera cam) {
         JMenuBar bar = new JMenuBar();
+
+        //## Einstellungen
+
         JMenu menu = new JMenu("Dart");
 
         JMenuItem settings = new JMenuItem("Einstellungen");
@@ -107,13 +118,70 @@ public class DartMainForm extends JFrame implements Runnable {
         });
         menu.add(settings);
 
+        JMenuItem newZoomArea = new JMenuItem("Zoombereich erstellen");
+        newZoomArea.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ZoomedAreaDialog(new DartCamPanel(cam));
+            }
+        });
+        menu.add(newZoomArea);
+
+        //## Auflösungen
+
+        JMenu menuRes = new JMenu("Auflösung");
+        Map<Integer,JRadioButtonMenuItem> items = new HashMap<>();
+        ButtonGroup bg = new ButtonGroup();
+        int currentHeight = cam.getFrame().size().height();
+        ActionListener listener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String[] arr = ((JRadioButtonMenuItem)e.getSource()).getText().split("x");
+                cam.stop();
+                cam.init(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]));
+                cam.start();
+            }
+        };
+
+        JRadioButtonMenuItem r1080 = new JRadioButtonMenuItem("1920x1080");
+        JRadioButtonMenuItem r1024 = new JRadioButtonMenuItem("1280x1024");
+        JRadioButtonMenuItem r720 = new JRadioButtonMenuItem("1280x720");
+        JRadioButtonMenuItem r768 = new JRadioButtonMenuItem("1024x768");
+        JRadioButtonMenuItem r600 = new JRadioButtonMenuItem("800x600");
+        JRadioButtonMenuItem r480 = new JRadioButtonMenuItem("640x480");
+        menuRes.add(r1080);
+        menuRes.add(r1024);
+        menuRes.add(r720);
+        menuRes.add(r768);
+        menuRes.add(r600);
+        menuRes.add(r480);
+        items.put(1080, r1080);
+        items.put(1024, r1024);
+        items.put(720, r720);
+        items.put(768, r768);
+        items.put(600, r600);
+        items.put(480, r480);
+        bg.add(r1080);
+        bg.add(r1024);
+        bg.add(r720);
+        bg.add(r768);
+        bg.add(r600);
+        bg.add(r480);
+        r1080.addActionListener(listener);
+        r1024.addActionListener(listener);
+        r720.addActionListener(listener);
+        r768.addActionListener(listener);
+        r600.addActionListener(listener);
+        r480.addActionListener(listener);
+        items.get(currentHeight).setSelected(true);
+
         bar.add(menu);
+        bar.add(menuRes);
         this.setJMenuBar(bar);
     }
 
-    private void generateRightPanel() {
-        Camera cam = new Camera();
-        cam.init(AppPreferences.getInstance().getChoosenCamera());
+    private void generateRightPanel(Camera cam) {
+//        cam.init(AppPreferences.getInstance().getChoosenCamera());
         DartCamPanel pan = new DartCamPanel(cam);
         settingsDialog.camera = cam;
         splitPaneHorizontal.setBottomComponent(pan);
@@ -123,10 +191,10 @@ public class DartMainForm extends JFrame implements Runnable {
 
         splitPaneHorizontal.setDividerLocation(AppPreferences.getInstance().getDividerLocationHorizontal());
 
-        ZoomedAreaDialog dialog = new ZoomedAreaDialog();
-        dialog.setSize(100,100);
-        dialog.setVisible(true);
-        dialog.add(new DartCamPanel(cam));
+        Graphics2D g = (Graphics2D)pan.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_SPEED);
+
 //        cam.start();
     }
 

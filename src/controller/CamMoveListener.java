@@ -40,12 +40,12 @@ public class CamMoveListener implements MouseListener, MouseWheelListener, Mouse
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        camPosition.showZoomLevel = true;
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        camPosition.showZoomLevel = false;
     }
 
     @Override

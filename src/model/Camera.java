@@ -2,25 +2,21 @@ package model;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.ds.buildin.WebcamDefaultDevice;
-import com.jogamp.common.nio.ByteBufferInputStream;
-import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_videoio;
 import org.bytedeco.javacpp.opencv_videoio.VideoCapture;
-import view.DartCamPanel;
-import view.FramelessDialog;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
-import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Camera extends Observable implements Runnable {
+    private static final int DEFAULT_CAMERA_WIDTH = 1280;
+    private static final int DEFAULT_CAMERA_HEIGHT = 720;
+
     private static List<String> cameraNames;
 
     private volatile boolean running = true;
@@ -50,8 +46,24 @@ public class Camera extends Observable implements Runnable {
 //        this.dartCamPanel = dartCamPanel;
     }
 
+    public void init(int width, int height) {
+        init(AppPreferences.getInstance().getChoosenCamera(), width, height);
+    }
+
     public void init(int deviceNumber) {
+        init(deviceNumber, -1, -1);
+    }
+
+    public void init(int deviceNumber, int width, int height) {
         this.camera = new VideoCapture(deviceNumber);
+        if (width != -1 && height != -1) {
+            camera.set(opencv_videoio.CV_CAP_PROP_FRAME_WIDTH, width);
+            camera.set(opencv_videoio.CV_CAP_PROP_FRAME_HEIGHT, height);
+        } else {
+            camera.set(opencv_videoio.CV_CAP_PROP_FRAME_WIDTH, DEFAULT_CAMERA_WIDTH);
+            camera.set(opencv_videoio.CV_CAP_PROP_FRAME_HEIGHT, DEFAULT_CAMERA_HEIGHT);
+        }
+
         this.gConfig = GraphicsEnvironment.
                 getLocalGraphicsEnvironment().getDefaultScreenDevice().
                 getDefaultConfiguration();
@@ -121,29 +133,48 @@ public class Camera extends Observable implements Runnable {
 
     @Override
     public void run() {
-//    testFPS();
+    testFPS();
 //        this.doRepaints();
         running = true;
+
+//        g.setRenderingHint(RenderingHints.KEY_RENDERING,
+//                RenderingHints.VALUE_RENDER_QUALITY);
+//        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//                RenderingHints.VALUE_ANTIALIAS_ON);
+//        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+//                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+//                RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+//        g.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+//                RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+//        g.setRenderingHint(RenderingHints.KEY_DITHERING,
+//                RenderingHints.VALUE_DITHER_ENABLE);
+//
+//        volatileContext.setRenderingHint(RenderingHints.KEY_RENDERING,
+//                RenderingHints.VALUE_RENDER_QUALITY);
+//        volatileContext.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//                RenderingHints.VALUE_ANTIALIAS_ON);
+//        volatileContext.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+//                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//        volatileContext.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+//                RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+//        volatileContext.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+//                RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+//        volatileContext.setRenderingHint(RenderingHints.KEY_DITHERING,
+//                RenderingHints.VALUE_DITHER_ENABLE);
         while(running){
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-//            dartCamPanel.repaint();
             if (camera.read(frame)){
                 frameCounter++;
+
                 ByteBuffer bb = frame.createBuffer();
-//                frame.create(new opencv_core.Size(100,100), 1);
-//                BufferedImage img = gConfig.createCompatibleImage(frame.size().width(), frame.size().height());
-//                img.
                 bb.get(byteBuffer, 0, bb.capacity());
+
                 volatileContext.drawImage(bufferedImage, 0, 0, null);
-//                System.out.println(images.size());
                 setChanged();
                 notifyObservers();
             }
         }
+        camera.release();
     }
 
     private void testFPS() {

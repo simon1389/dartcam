@@ -1,4 +1,3 @@
-import sun.swing.SwingUtilities2;
 import view.DartMainForm;
 
 import javax.swing.*;

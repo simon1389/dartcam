@@ -30,16 +30,11 @@ public class FramelessDialog extends JDialog {
         layeredPane.add(fixButton, 2);
 
 
-        JDialog d = this;
         this.fixButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                d.setVisible(false);
-                d.dispose();
-                d.setUndecorated(!d.isUndecorated());
-                d.setVisible(true);
-                d.setAlwaysOnTop(true);
+                onFixButtonClick();
             }
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -61,4 +56,11 @@ public class FramelessDialog extends JDialog {
         });
     }
 
+    protected void onFixButtonClick() {
+        setVisible(false);
+        dispose();
+        setUndecorated(!isUndecorated());
+        setVisible(true);
+        setAlwaysOnTop(true);
+    }
 }

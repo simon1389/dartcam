@@ -85,6 +85,26 @@ public class AppPreferences {
         }
     }
 
+    public void saveZoomedArea(int zaIndex, Object o) {
+        try {
+            prefs.putByteArray("za" + zaIndex, AppPreferences.object2Bytes(o));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Object getZoomedArea(int zaIndex) {
+        try {
+            return AppPreferences.bytes2Object(prefs.getByteArray("za" + zaIndex, null));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     static private byte[] object2Bytes( Object o ) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream( baos );
@@ -94,6 +114,9 @@ public class AppPreferences {
 
     static private Object bytes2Object( byte raw[] )
             throws IOException, ClassNotFoundException {
+        if (raw == null) {
+            return null;
+        }
         ByteArrayInputStream bais = new ByteArrayInputStream( raw );
         ObjectInputStream ois = new ObjectInputStream( bais );
         return ois.readObject();
