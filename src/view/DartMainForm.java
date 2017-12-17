@@ -213,6 +213,13 @@ public class DartMainForm extends JFrame implements Runnable {
         BrowserView view1 = new BrowserView(browser1);
 
         secondCamDialog.add(view1);
+        JTextField textField = new JTextField("FaceCam");
+        textField.setHorizontalAlignment(SwingConstants.CENTER);
+        textField.setFont(new Font("Arial", Font.ITALIC, 20));
+        textField.setForeground(Color.RED);
+        textField.setEditable(false);
+        textField.setBackground(Color.decode("#EEEEEE"));
+        secondCamDialog.add(textField,BorderLayout.NORTH);
         browser1.loadURL(AppPreferences.getInstance().getSecondCamURL());
         secondCamDialog.setBounds(AppPreferences.getInstance().getSecondCamBounds());
         secondCamDialog.setResizable(true);
