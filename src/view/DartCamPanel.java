@@ -3,17 +3,12 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
 import controller.CamMoveListener;
-import model.CamPosition;
-import model.Camera;
-import model.ZoomedArea;
+import model.cam.CamPosition;
+import model.cam.Camera;
 import org.bytedeco.javacpp.opencv_videoio;
 
 public class DartCamPanel extends JPanel implements Observer {

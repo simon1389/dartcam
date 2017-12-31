@@ -4,9 +4,8 @@ import com.sun.jna.Platform;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserType;
 import com.teamdev.jxbrowser.chromium.swing.BrowserView;
-import model.AppPreferences;
-import model.Camera;
-import model.ZoomedArea;
+import model.cam.AppPreferences;
+import model.cam.Camera;
 
 import javax.swing.*;
 import java.awt.*;

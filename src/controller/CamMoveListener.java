@@ -1,8 +1,6 @@
 package controller;
 
-import model.CamPosition;
-import model.Camera;
-import model.MoveableElement;
+import model.cam.CamPosition;
 
 import java.awt.*;
 import java.awt.event.*;

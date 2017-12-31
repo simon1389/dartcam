@@ -1,13 +1,10 @@
 package view;
 
-import com.intellij.uiDesigner.core.GridConstraints;
-import model.AppPreferences;
-import model.Camera;
+import model.cam.AppPreferences;
+import model.cam.Camera;
 
 import javax.swing.*;
 import java.awt.event.*;
-import java.util.*;
-import java.util.List;
 
 public class Settings extends JDialog {
     private JPanel contentPane;
